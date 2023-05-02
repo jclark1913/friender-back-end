@@ -1,5 +1,5 @@
 import os
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from flask import (
     Flask, render_template, request, flash, redirect, session, g, abort,
 )
@@ -9,7 +9,7 @@ s3 = boto3.client('s3')
 
 
 
-load_dotenv()
+#load_dotenv()
 
 
 
@@ -28,5 +28,5 @@ app = Flask(__name__)
 @app.route("/upload", methods=["POST"])
 def upload_photo():
     """Test s3 bucket"""
-    s3.upload_file("./testphoto.jpg", "friender-may-2023", "test.photos")
+    s3.upload_file("./testphoto.jpg", "friender-rithm-terrysli", "test.photos")
 

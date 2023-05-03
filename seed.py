@@ -1,7 +1,7 @@
 """Seed test users, messages, and friendships"""
 import random
-from app import app
-from models import db, User, Message, Friendship, connect_db
+from app import db
+from models import User, Message, Friendship
 from faker import Faker
 
 fake = Faker()

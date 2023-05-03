@@ -4,7 +4,7 @@ from flask import (
     Flask, render_template, request, flash, redirect, session, g, abort,
 )
 import boto3
-from models import db, connect_db
+from models import User, Message, Friendship, db, connect_db
 
 
 s3 = boto3.client('s3')

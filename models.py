@@ -53,6 +53,39 @@ class User(db.Model):
         nullable=False
     )
 
+    sent_messages = db.relationship(
+        "Message", foreign_keys="from_user"
+    )
+
+    received_messages = db.relationship(
+        'Message', foreign_keys="to_user"
+    )
+
+@classmethod
+def all():
+    """Get all users"""
+
+    users = User.query.all()
+
+    return users
+
+@classmethod
+def get(username):
+    """Get a specific user"""
+
+    user = User.query.get_or_404(username)
+
+    return user
+
+@classmethod
+def messages_from(username):
+    """Get all messages from a user"""
+
+    user = User.query.get_or_404(username)
+
+
+
+#########  Message Class  ##########
 
 class Message(db.Model):
     """Messages sent from one User to another"""

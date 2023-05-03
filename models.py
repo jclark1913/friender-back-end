@@ -112,17 +112,19 @@ class User(db.Model):
         db.session.add(new_user)
         return new_user
 
+
     @classmethod
     def all(cls):
-        """Get all users"""
+        """Return all users"""
 
         users = User.query.all()
 
         return users
 
+
     @classmethod
     def get(cls, username):
-        """Get a specific user"""
+        """Return a specific user"""
 
         user = User.query.get_or_404(username)
 
@@ -130,20 +132,29 @@ class User(db.Model):
 
 
     @classmethod
-    def update(cls, username, email, password, location, bio, friend_radius, photo, is_admin):
+    def update(cls, username, email, location, bio, friend_radius, photo, is_admin):
         """Update data for a specific user"""
 
         updated_user = User.query.get_or_404(username)
-        updated_user.email = email
-        updated_user.password = password
-        updated_user.location = location
-        updated_user.bio = bio
-        updated_user.friend_radius = friend_radius
-        updated_user.photo = photo
-        updated_user.is_admin = is_admin
+        updated_user.email = email or updated_user.email
+        updated_user.location = location or updated_user.location
+        updated_user.bio = bio or updated_user.bio
+        updated_user.friend_radius = friend_radius or updated_user.friend_radius
+        updated_user.photo = photo or updated_user.photo
+        updated_user.is_admin = is_admin or updated_user.is_admin
 
-        db.session.commit()
         return updated_user
+
+
+    @classmethod
+    def delete(cls, username):
+        """Delete a specific user from db"""
+
+        user = User.query.get_or_404(username)
+        db.session.delete(user)
+
+        return username
+
 
     @classmethod
     def messages_from(cls, username):

@@ -78,18 +78,44 @@ def create_new_user():
     db.session.commit()
 
     serialized = new_user.serialize()
-    return jsonify(user=serialized)
+    return (jsonify(user=serialized), 201)
 
 
 # PATCH edit user (admin/loggedin/sameuser)
-@app.route("/users", method=["PATCH"])
-def update_user():
+@app.route("/users/<username>", methods=["PATCH"])
+def update_user(username):
     """Update user data"""
 
+    if "email" in request.json: email = request.json["email"]
+    if "location" in request.json: location = request.json["location"]
+    if "bio" in request.json: bio = request.json["bio"]
+    if "friend_radius" in request.json: friend_radius = request.json["friend_radius"]
+    if "photo" in request.json: photo = request.json["photo"]
+    if "is_admin" in request.json: is_admin = request.json["is_admin"]
+
+    updated_user = User.update(username=username,
+        email=email,
+        location=location,
+        bio=bio,
+        friend_radius=friend_radius,
+        photo=photo,
+        is_admin=is_admin)
+
+    db.session.commit()
+
+    serialized = updated_user.serialize()
+    return jsonify(user=serialized)
 
 
 # DELETE user (admin/loggedin/sameuser)
+@app.route("/users/<username>", methods=["DELETE"])
+def delete_user(username):
+    """Delete a user"""
 
+    User.delete(username)
+    db.session.commit()
+
+    return jsonify({"deleted": username})
 
 
 

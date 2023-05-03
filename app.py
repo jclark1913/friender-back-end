@@ -26,13 +26,31 @@ jwt = JWTManager(app)
 connect_db(app)
 
 
-def create_token(user):
+def create_access_token(user):
     """Create access token for user"""
 
     token = create_access_token(
         identity=user.username,
         additional_claims={"is_admin": user.is_admin})
     return jsonify(token)
+
+
+########## auth routes
+
+@app.route("/auth/login", methods=["POST"])
+def login():
+    """Log in user and return access token if valid username/password,
+    otherwise return error message"""
+
+    username = request.json["username"]
+    password = request.json["password"]
+
+    user = User.authenticate(username, password)
+    if user:
+        token = create_access_token(user)
+        return token
+    else:
+        return jsonify(({"Error": "Invalid username/password"}), 401)
 
 
 ########################

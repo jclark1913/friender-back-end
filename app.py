@@ -44,7 +44,6 @@ def get_user_by_username(username):
     """Returns given user"""
 
     user = User.get(username)
-
     serialized = user.serialize()
 
     return jsonify(user=serialized)
@@ -124,3 +123,14 @@ def delete_user(username):
 #     """Test s3 bucket"""
 #     s3.upload_file("./testphoto.jpg", "friender-rithm-terrysli", "test.photos")
 
+
+########## /messages routes
+
+@app.route("/messages", methods=["GET"])
+def get_all_messages():
+    """Return data on all messages"""
+
+    messages = Message.all()
+    serialized = [m.serialize() for m in messages]
+
+    return jsonify(messages=serialized)

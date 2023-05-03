@@ -200,6 +200,33 @@ class Message(db.Model):
         nullable=False,
     )
 
+    def serialize(self):
+            """Serialize Message to dictionary"""
+
+            return {
+            "id": self.id,
+            "text": self.text,
+            "from_user": self.from_user,
+            "to_user": self.to_user,
+            }
+
+
+    @classmethod
+    def all(cls):
+        """Return all messages"""
+        messages = User.query.all()
+
+        return messages
+
+
+    @classmethod
+    def get(cls, id):
+        """Return a specific message"""
+
+        message = Message.query.get_or_404(id)
+
+        return message
+
 
 class Friendship(db.Model):
     """A pending, accepted, or rejected friendship between 2 Users"""

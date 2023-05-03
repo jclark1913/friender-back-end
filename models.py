@@ -54,34 +54,85 @@ class User(db.Model):
     )
 
     sent_messages = db.relationship(
-        "Message", foreign_keys="from_user"
+        "Message", foreign_keys="Message.from_user", backref="sent_by"
     )
 
     received_messages = db.relationship(
-        'Message', foreign_keys="to_user"
+        "Message", foreign_keys="Message.to_user", backref="received_by"
     )
 
-@classmethod
-def all():
-    """Get all users"""
+    def serialize(self):
+        """Serialize to dictionary"""
 
-    users = User.query.all()
+        return {
+        "username": self.username,
+        "email": self.email,
+        "location": self.location,
+        "bio": self.bio,
+        "friend_radius": self.friend_radius,
+        "photo": self.photo
+        }
 
-    return users
+    #TODO: Figure out friends relationship
 
-@classmethod
-def get(username):
-    """Get a specific user"""
+    # friends = db.relationship(
+    #     # join on either user column
+    #     # must be accepted friendship
+    #     "Friendship",
+    #     primaryjoin=(Friendship.sender == username)
+    #     secondaryjoin=(Friendship.status == "accepted")
 
-    user = User.query.get_or_404(username)
+    #     # secondary="friendships",
+    #     # primaryjoin=(Friendship.sender == username, Friendship.receiver == username),
+    #     # secondaryjoin=()
 
-    return user
+    # )
 
-@classmethod
-def messages_from(username):
-    """Get all messages from a user"""
+    # outgoing_requests = db.relationship()
 
-    user = User.query.get_or_404(username)
+    # received_requests = db.relationship()
+
+    @classmethod
+    def register(cls, username, email, password, location, bio, friend_radius, photo, is_admin):
+        """Registers new user and adds them to db"""
+
+        hashed_password = bcrypt.generate_password_hash(password).decode('UTF-8')
+
+        new_user = User(
+            username=username,
+            email=email,
+            hashed_password=hashed_password,
+            location=location,
+            bio=bio,
+            friend_radius=friend_radius,
+            photo=photo,
+            is_admin=is_admin
+        )
+
+        db.session.add(new_user)
+        return new_user
+
+    @classmethod
+    def all():
+        """Get all users"""
+
+        users = User.query.all()
+
+        return users
+
+    @classmethod
+    def get(username):
+        """Get a specific user"""
+
+        user = User.query.get_or_404(username)
+
+        return user
+
+    @classmethod
+    def messages_from(username):
+        """Get all messages from a user"""
+
+        user = User.query.get_or_404(username)
 
 
 

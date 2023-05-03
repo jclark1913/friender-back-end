@@ -135,6 +135,7 @@ def get_message_by_id(message_id):
 
 @app.route("/messages", methods=["POST"])
 def create_new_message():
+    """Create a new message"""
 
     from_user = request.json["from_user"]
     to_user = request.json["to_user"]
@@ -151,6 +152,7 @@ def create_new_message():
 
 @app.route("/friendships", methods=["GET"])
 def get_all_friendships():
+    """Get all friendship data"""
 
     friendships = Friendship.all()
 
@@ -160,9 +162,38 @@ def get_all_friendships():
 
 @app.route("/friendships/<int:friendship_id>", methods=["GET"])
 def get_friendship_by_id(friendship_id):
+    """Get friendship data by id"""
 
     friendship = Friendship.get(friendship_id)
 
     serialized = friendship.serialize()
+
+    return jsonify(friendship=serialized)
+
+
+@app.route("/friendships", methods=["POST"])
+def send_friend_request():
+    """Create new friendship request"""
+
+    sender = request.json["sender"]
+    recipient = request.json["recipient"]
+
+    friendship = Friendship.create(sender, recipient)
+    serialized = friendship.serialize()
+
+    db.session.commit()
+
+    return jsonify(friendship=serialized)
+
+@app.route("/friendships/<int:friendship_id>", methods=["PATCH"])
+def update_friend_request(friendship_id):
+    """Update status of friendship with given id"""
+
+    new_status = request.json["status"]
+
+    updated_friendship = Friendship.change_status(friendship_id, new_status)
+    serialized = updated_friendship.serialize()
+
+    db.session.commit()
 
     return jsonify(friendship=serialized)

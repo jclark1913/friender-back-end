@@ -280,6 +280,7 @@ class Friendship(db.Model):
         "status": self.status,
         }
 
+
     @classmethod
     def all(cls):
         """Returns all friendships"""
@@ -293,6 +294,29 @@ class Friendship(db.Model):
         """Returns friendship by id"""
 
         friendship = Friendship.query.get_or_404(id)
+
+        return friendship
+
+    @classmethod
+    def create(cls, sender, recipient):
+        """Create a friendship request"""
+
+        friendship = Friendship(
+            sender=sender,
+            recipient=recipient,
+            status="pending"
+        )
+
+        db.session.add(friendship)
+
+        return friendship
+
+    @classmethod
+    def change_status(cls, id, status):
+        """Change status of friendship request"""
+
+        friendship = Friendship.query.get_or_404(id)
+        friendship.status = status
 
         return friendship
 

@@ -132,16 +132,16 @@ class User(db.Model):
 
 
     @classmethod
-    def update(cls, username, email, location, bio, friend_radius, photo, is_admin):
+    def update(cls, username, data):
         """Update data for a specific user"""
 
         updated_user = User.query.get_or_404(username)
-        updated_user.email = email or updated_user.email
-        updated_user.location = location or updated_user.location
-        updated_user.bio = bio or updated_user.bio
-        updated_user.friend_radius = friend_radius or updated_user.friend_radius
-        updated_user.photo = photo or updated_user.photo
-        updated_user.is_admin = is_admin or updated_user.is_admin
+
+        updated_user.email = data.get("email", updated_user.email)
+        updated_user.location = data.get("location", updated_user.location)
+        updated_user.bio = data.get("bio", updated_user.bio)
+        updated_user.friend_radius = data.get("friend_radius", updated_user.friend_radius)
+        updated_user.photo = data.get("photo", updated_user.photo)
 
         return updated_user
 
@@ -214,7 +214,7 @@ class Message(db.Model):
     @classmethod
     def all(cls):
         """Return all messages"""
-        messages = User.query.all()
+        messages = Message.query.all()
 
         return messages
 
@@ -224,6 +224,20 @@ class Message(db.Model):
         """Return a specific message"""
 
         message = Message.query.get_or_404(id)
+
+        return message
+
+    @classmethod
+    def create(cls, from_user, to_user, text):
+        """Creates a new message"""
+
+        message = Message(
+            from_user = from_user,
+            to_user = to_user,
+            text = text
+        )
+
+        db.session.add(message)
 
         return message
 
@@ -255,6 +269,32 @@ class Friendship(db.Model):
         db.Text,
         nullable=False
     )
+
+    def serialize(self):
+        """Serialize to dictionary"""
+
+        return {
+        "id": self.id,
+        "sender": self.sender,
+        "recipient": self.recipient,
+        "status": self.status,
+        }
+
+    @classmethod
+    def all(cls):
+        """Returns all friendships"""
+
+        friendships = Friendship.query.all()
+
+        return friendships
+
+    @classmethod
+    def get(cls, id):
+        """Returns friendship by id"""
+
+        friendship = Friendship.query.get_or_404(id)
+
+        return friendship
 
 
 def connect_db(app):

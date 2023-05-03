@@ -28,15 +28,19 @@ user1 = User(
     email = "j@j.com",
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=48197,
-    bio=fake.sentence()
+    bio=fake.sentence(),
+    friend_radius=10,
+    is_admin=True
 )
 
 user2 = User(
-    username = "Terehh",
+    username = "Terrehh",
     email = "T@T.com",
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=48197,
-    bio=fake.sentence()
+    bio=fake.sentence(),
+    friend_radius=20,
+    is_admin=False
 )
 
 user3 = User(
@@ -44,21 +48,27 @@ user3 = User(
     email = fake.email(),
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=fake.postcode(),
-    bio=fake.sentence()
+    bio=fake.sentence(),
+    friend_radius=30,
+    is_admin=False
 )
 user4 = User(
     username = fake.ssn(),
     email = fake.email(),
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=fake.postcode(),
-    bio=fake.sentence()
+    bio=fake.sentence(),
+    friend_radius=40,
+    is_admin=False
 )
 user5 = User(
     username = fake.ssn(),
     email = fake.email(),
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=fake.postcode(),
-    bio=fake.sentence()
+    bio=fake.sentence(),
+    friend_radius=50,
+    is_admin=False
 )
 
 db.session.add_all([user1, user2, user3, user4, user5])
@@ -69,14 +79,14 @@ message1 = Message(
     text = fake.sentence(),
     timestamp=random.choice(RANDOM_TIMESTAMPS),
     from_user = "jdawg",
-    to_user = "Terehh"
+    to_user = "Terrehh"
 )
 
 message2 = Message(
     id = 2,
     text = fake.sentence(),
     timestamp=random.choice(RANDOM_TIMESTAMPS),
-    from_user = "Terehh",
+    from_user = "Terrehh",
     to_user = "jdawg"
 )
 
@@ -96,7 +106,7 @@ db.session.commit()
 friendship1 = Friendship(
     id = 1,
     sender = "jdawg",
-    recipient = "Terehh",
+    recipient = "Terrehh",
     status = "accepted"
 )
 

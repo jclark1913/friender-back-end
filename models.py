@@ -113,7 +113,7 @@ class Friendship(db.Model):
     )
 
     status = db.Column(
-        db.string(10),
+        db.Text,
         nullable=False
     )
 

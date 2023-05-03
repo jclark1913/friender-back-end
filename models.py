@@ -100,19 +100,22 @@ class Friendship(db.Model):
         autoincrement=True
     )
 
-    from_user = db.Column(
+    sender = db.Column(
         db.Text,
         db.ForeignKey('users.username', ondelete='CASCADE'),
         nullable=False,
     )
 
-    to_user = db.Column(
+    recipient = db.Column(
         db.Text,
         db.ForeignKey('users.username', ondelete='CASCADE'),
         nullable=False,
     )
 
-
+    status = db.Column(
+        db.string(10),
+        nullable=False
+    )
 
 
 def connect_db(app):

@@ -49,7 +49,7 @@ def get_user_by_username(username):
     return jsonify(user=serialized)
 
 
-# POST create new user (register)
+# POST create new user (register) TODO: Validate info before making new user
 @app.route("/users", methods=["POST"])
 def create_new_user():
     """Creates new user"""
@@ -80,33 +80,22 @@ def create_new_user():
     return (jsonify(user=serialized), 201)
 
 
-# PATCH edit user (admin/loggedin/sameuser)
+# PATCH edit user (TODO: add middleware for admin/loggedin/sameuser)
 @app.route("/users/<username>", methods=["PATCH"])
 def update_user(username):
     """Update user data"""
 
-    if "email" in request.json: email = request.json["email"]
-    if "location" in request.json: location = request.json["location"]
-    if "bio" in request.json: bio = request.json["bio"]
-    if "friend_radius" in request.json: friend_radius = request.json["friend_radius"]
-    if "photo" in request.json: photo = request.json["photo"]
-    if "is_admin" in request.json: is_admin = request.json["is_admin"]
 
-    updated_user = User.update(username=username,
-        email=email,
-        location=location,
-        bio=bio,
-        friend_radius=friend_radius,
-        photo=photo,
-        is_admin=is_admin)
-
-    db.session.commit()
+    data = request.json
+    updated_user = User.update(username=username, data=data)
 
     serialized = updated_user.serialize()
+    db.session.commit()
+
     return jsonify(user=serialized)
 
 
-# DELETE user (admin/loggedin/sameuser)
+# DELETE user (TODO: add middleware for admin/loggedin/sameuser)
 @app.route("/users/<username>", methods=["DELETE"])
 def delete_user(username):
     """Delete a user"""
@@ -134,3 +123,46 @@ def get_all_messages():
     serialized = [m.serialize() for m in messages]
 
     return jsonify(messages=serialized)
+
+@app.route("/messages/<int:message_id>", methods=["GET"])
+def get_message_by_id(message_id):
+    """Returns a message of a given id"""
+
+    message = Message.get(message_id)
+    serialized = message.serialize()
+
+    return jsonify(message=serialized)
+
+@app.route("/messages", methods=["POST"])
+def create_new_message():
+
+    from_user = request.json["from_user"]
+    to_user = request.json["to_user"]
+    text = request.json["text"]
+
+    message = Message.create(from_user=from_user, to_user=to_user, text=text)
+    serialized = message.serialize()
+
+    db.session.commit()
+
+    return jsonify(message=serialized)
+
+####### /friendships
+
+@app.route("/friendships", methods=["GET"])
+def get_all_friendships():
+
+    friendships = Friendship.all()
+
+    serialized = [f.serialize() for f in friendships]
+
+    return jsonify(friendships=serialized)
+
+@app.route("/friendships/<int:friendship_id>", methods=["GET"])
+def get_friendship_by_id(friendship_id):
+
+    friendship = Friendship.get(friendship_id)
+
+    serialized = friendship.serialize()
+
+    return jsonify(friendship=serialized)

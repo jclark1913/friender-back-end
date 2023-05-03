@@ -4,10 +4,9 @@ from flask import (
     Flask, render_template, request, flash, redirect, session, g, abort, jsonify
 )
 from models import User, Message, Friendship, db, connect_db
-
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import JWTManager
 import boto3
-
-
 
 s3 = boto3.client('s3')
 
@@ -21,8 +20,20 @@ app.config['SQLALCHEMY_ECHO'] = False
 #app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 #toolbar = DebugToolbarExtension(app)
+app.config["JWT_SECRET_KEY"] = "super-secret"
+jwt = JWTManager(app)
 
 connect_db(app)
+
+
+def create_token(user):
+    """Create access token for user"""
+
+    token = create_access_token(
+        identity=user.username,
+        additional_claims={"is_admin": user.is_admin})
+    return jsonify(token)
+
 
 ########################
 

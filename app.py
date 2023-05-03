@@ -26,27 +26,29 @@ connect_db(app)
 
 ########################
 
-# users
+# /users routes
 
 # GET all users (TODO: add admin protected middleware)
 @app.route("/users", methods=["GET"])
 def show_all_users():
     """Returns all users"""
 
-    users = User.query.all()
+    users = User.all()
     serialized = [u.serialize() for u in users]
     return jsonify(users=serialized)
+
 
 # GET user by username (admin/loggedin/sameuser/friend?) NOTE: need to block rejected connections
 @app.route("/users/<username>")
 def get_user_by_username(username):
     """Returns given user"""
 
-    user = User.query.get_or_404(username)
+    user = User.get(username)
 
     serialized = user.serialize()
 
     return jsonify(user=serialized)
+
 
 # POST create new user (register)
 @app.route("/users", methods=["POST"])
@@ -80,6 +82,11 @@ def create_new_user():
 
 
 # PATCH edit user (admin/loggedin/sameuser)
+@app.route("/users", method=["PATCH"])
+def update_user():
+    """Update user data"""
+
+
 
 # DELETE user (admin/loggedin/sameuser)
 

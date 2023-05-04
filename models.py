@@ -73,19 +73,20 @@ class User(db.Model):
         "photo": self.photo
         }
 
-    #TODO: Figure out friends relationship
+    # recipient_friends = db.relationship(
+    #     "User",
+    #     secondary="friendships",
+    #     primaryjoin="User.username==Friendship.sender",
+    #     secondaryjoin="User.username==Friendship.recipient",
+    #     backref="sender_friends"
+    # )
 
-    # friends = db.relationship(
-    #     # join on either user column
-    #     # must be accepted friendship
-    #     "Friendship",
-    #     primaryjoin=(Friendship.sender == username)
-    #     secondaryjoin=(Friendship.status == "accepted")
-
-    #     # secondary="friendships",
-    #     # primaryjoin=(Friendship.sender == username, Friendship.receiver == username),
-    #     # secondaryjoin=()
-
+    # sender_friends = db.relationship(
+    #     "User",
+    #     secondary="friendships",
+    #     primaryjoin="User.username==Friendship.recipient",
+    #     secondaryjoin="User.username==Friendship.sender",
+    #     backref="recipient_friends"
     # )
 
     # outgoing_requests = db.relationship()
@@ -180,6 +181,22 @@ class User(db.Model):
         user = User.query.get_or_404(username)
 
 
+    def friends(self):
+        """Return array of all accepted friends"""
+
+        sender_friends = db.session.query(User)\
+            .join("Friendship, User.username == Friendship.sender")\
+            .filter("or_(Friendship.sender == self.username, Friendship.recipient == self.username)",\
+                "Friendship.status == 'accepted'",\
+                "Friendship.sender != self.username")\
+            .all()
+        recipient_friends = db.session.query(User)\
+            .join("Friendship, User.username == Friendship.recipient")\
+            .filter("or_(Friendship.sender == self.username, Friendship.recipient == self.username)",\
+                    "Friendship.status == 'accepted'",\
+                    "Friendship.sender != self.username")\
+            .all()
+        return sender_friends + recipient_friends
 
 #########  Message Class  ##########
 

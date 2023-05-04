@@ -162,9 +162,11 @@ def delete_user(username):
 ########## /messages routes
 
 @app.route("/messages", methods=["GET"])
-@jwt_required(0)
+@jwt_required()
 def get_all_messages():
     """Return data on all messages"""
+
+    claims = get_jwt()
 
     if claims["is_admin"] == True:
         messages = Message.all()

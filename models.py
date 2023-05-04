@@ -181,22 +181,22 @@ class User(db.Model):
 
         user = User.query.get_or_404(username)
 
-
-    def friends(self):
+    @classmethod
+    def friends(cls, username):
         """Return array of all accepted friends"""
 
 
         sender_friends = db.session.query(User)\
             .join(Friendship, User.username == Friendship.sender)\
-            .filter(or_(Friendship.sender == self.username, Friendship.recipient == self.username),\
+            .filter(or_(Friendship.sender == username, Friendship.recipient == username),\
                 Friendship.status == 'accepted',\
-                Friendship.recipient == self.username)\
+                Friendship.recipient == username)\
             .all()
         recipient_friends = db.session.query(User)\
             .join(Friendship, User.username == Friendship.recipient)\
-            .filter(or_(Friendship.sender == self.username, Friendship.recipient == self.username),\
+            .filter(or_(Friendship.sender == username, Friendship.recipient == username),\
                 Friendship.status == 'accepted',\
-                Friendship.sender == self.username)\
+                Friendship.sender == username)\
             .all()
         return sender_friends + recipient_friends
 

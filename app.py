@@ -5,28 +5,29 @@ from flask import (
 )
 from models import User, Message, Friendship, db, connect_db
 from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt
+from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 import boto3
-
 s3 = boto3.client('s3')
 
 load_dotenv()
 
-
 app = Flask(__name__)
+jwt = JWTManager(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_ECHO'] = False
 #app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 #toolbar = DebugToolbarExtension(app)
-app.config["JWT_SECRET_KEY"] = "super-secret"
-jwt = JWTManager(app)
+app.config["JWT_SECRET_KEY"] = "super-secret" # TODO: Update .env
 
 connect_db(app)
 
 
-def create_access_token(user):
+def get_token(user):
     """Create access token for user"""
 
     token = create_access_token(
@@ -47,7 +48,7 @@ def login():
 
     user = User.authenticate(username, password)
     if user:
-        token = create_access_token(user)
+        token = get_token(user)
         return token
     else:
         return jsonify(({"Error": "Invalid username/password"}), 401)
@@ -57,18 +58,24 @@ def login():
 
 # /users routes
 
-# GET all users (TODO: add admin protected middleware)
+# GET all users (ADMIN ONLY)
 @app.route("/users", methods=["GET"])
+@jwt_required()
 def show_all_users():
     """Returns all users"""
 
-    users = User.all()
-    serialized = [u.serialize() for u in users]
-    return jsonify(users=serialized)
+    claims = get_jwt()
+    if claims["is_admin"] == True:
+        users = User.all()
+        serialized = [u.serialize() for u in users]
+        return jsonify(users=serialized)
+
+    return jsonify(({"Error": "This route is admin-protected", "status_code": 401}))
 
 
-# GET user by username (admin/loggedin/sameuser/friend?) NOTE: need to block rejected connections
+# GET user by username (admin/loggedin/sameuser/friend?) TODO: need to block rejected connections
 @app.route("/users/<username>")
+@jwt_required()
 def get_user_by_username(username):
     """Returns given user"""
 
@@ -90,7 +97,6 @@ def create_new_user():
     bio = request.json["bio"]
     friend_radius = request.json["friend_radius"]
     photo = request.json["photo"]
-    is_admin = request.json["is_admin"]
 
     new_user = User.register(
         username=username,
@@ -100,7 +106,7 @@ def create_new_user():
         bio=bio,
         friend_radius=friend_radius,
         photo=photo,
-        is_admin=is_admin
+        is_admin=False
         )
 
     db.session.commit()
@@ -111,30 +117,41 @@ def create_new_user():
 
 # PATCH edit user (TODO: add middleware for admin/loggedin/sameuser)
 @app.route("/users/<username>", methods=["PATCH"])
+@jwt_required()
 def update_user(username):
     """Update user data"""
 
+    claims = get_jwt()
+    identity = get_jwt_identity()
 
-    data = request.json
-    updated_user = User.update(username=username, data=data)
+    if claims["is_admin"] == True or identity == username:
+        data = request.json
+        updated_user = User.update(username=username, data=data)
 
-    serialized = updated_user.serialize()
-    db.session.commit()
+        serialized = updated_user.serialize()
+        db.session.commit()
 
-    return jsonify(user=serialized)
+        return jsonify(user=serialized)
+
+    return jsonify(({"Error": "Unauthorized", "status_code": 401}))
 
 
 # DELETE user (TODO: add middleware for admin/loggedin/sameuser)
 @app.route("/users/<username>", methods=["DELETE"])
+@jwt_required()
 def delete_user(username):
     """Delete a user"""
 
-    User.delete(username)
-    db.session.commit()
+    claims = get_jwt()
+    identity = get_jwt_identity()
 
-    return jsonify({"deleted": username})
+    if claims["is_admin"] == True or identity == username:
+        User.delete(username)
+        db.session.commit()
 
+        return jsonify({"deleted": username})
 
+    return jsonify(({"Error": "Unauthorized", "status_code": 401}))
 
 # @app.route("/upload", methods=["POST"])
 # def upload_photo():
@@ -145,17 +162,24 @@ def delete_user(username):
 ########## /messages routes
 
 @app.route("/messages", methods=["GET"])
+@jwt_required(0)
 def get_all_messages():
     """Return data on all messages"""
 
-    messages = Message.all()
-    serialized = [m.serialize() for m in messages]
+    if claims["is_admin"] == True:
+        messages = Message.all()
+        serialized = [m.serialize() for m in messages]
 
-    return jsonify(messages=serialized)
+        return jsonify(messages=serialized)
 
+    return jsonify(({"Error": "Unauthorized", "status_code": 401}))
+
+
+# NOTE: needed?
 @app.route("/messages/<int:message_id>", methods=["GET"])
 def get_message_by_id(message_id):
     """Returns a message of a given id"""
+
 
     message = Message.get(message_id)
     serialized = message.serialize()

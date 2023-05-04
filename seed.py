@@ -131,5 +131,12 @@ friendship4 = Friendship(
     status = "rejected"
 )
 
-db.session.add_all([friendship1, friendship2, friendship3, friendship4])
+friendship5 = Friendship(
+    id = 5,
+    sender = user4.username,
+    recipient = "jdawg",
+    status = "accepted"
+)
+
+db.session.add_all([friendship1, friendship2, friendship3, friendship4, friendship5])
 db.session.commit()

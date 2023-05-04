@@ -51,7 +51,7 @@ def login():
         token = get_token(user)
         return token
     else:
-        return jsonify(({"Error": "Invalid username/password"}), 401)
+        return jsonify({"Error": "Invalid username/password"}), 401
 
 
 ########################
@@ -70,7 +70,7 @@ def show_all_users():
         serialized = [u.serialize() for u in users]
         return jsonify(users=serialized)
 
-    return jsonify(({"Error": "This route is admin-protected", "status_code": 401}))
+    return jsonify({"Error": "This route is admin-protected"}), 401
 
 
 # GET user by username (admin/loggedin/sameuser/friend?) TODO: need to block rejected connections
@@ -112,7 +112,7 @@ def create_new_user():
     db.session.commit()
 
     serialized = new_user.serialize()
-    return (jsonify(user=serialized), 201)
+    return jsonify(user=serialized), 201
 
 
 # PATCH edit user (TODO: add middleware for admin/loggedin/sameuser)
@@ -133,7 +133,7 @@ def update_user(username):
 
         return jsonify(user=serialized)
 
-    return jsonify(({"Error": "Unauthorized", "status_code": 401}))
+    return jsonify({"Error": "Unauthorized"}), 401
 
 
 # DELETE user (TODO: add middleware for admin/loggedin/sameuser)
@@ -151,7 +151,7 @@ def delete_user(username):
 
         return jsonify({"deleted": username})
 
-    return jsonify(({"Error": "Unauthorized", "status_code": 401}))
+    return jsonify({"Error": "Unauthorized"}), 401
 
 # @app.route("/upload", methods=["POST"])
 # def upload_photo():
@@ -172,7 +172,7 @@ def get_all_messages():
 
         return jsonify(messages=serialized)
 
-    return jsonify(({"Error": "Unauthorized", "status_code": 401}))
+    return jsonify({"Error": "Unauthorized"}), 401
 
 
 # NOTE: needed?

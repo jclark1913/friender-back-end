@@ -24,6 +24,7 @@ app.config['SQLALCHEMY_ECHO'] = False
 #app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 #toolbar = DebugToolbarExtension(app)
+app.config['UPLOAD_FOLDER'] = "./temp"
 app.config["JWT_SECRET_KEY"] = "super-secret" # TODO: Update .env
 
 connect_db(app)
@@ -263,10 +264,19 @@ def upload_file():
     try:
         file = request.files['file_from_react']
         filename = file.filename
-        print(f"Uploading file {filename}")
-        file_bytes = file.read()
-        file_content = BytesIO(file_bytes).readlines()
-        print(file_content)
+        with open(filename, "rb") as f:
+            s3.upload_file(f, "friender-may-2023", filename)
+
+
+        # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) NOTE: SAVES TO DIRECTORY
+
+
+
+
+        # print(f"Uploading file {filename}")
+        # file_bytes = file.read()
+        # file_content = BytesIO(file_bytes).readlines()
+        # print(file_content)
         d['status'] = 1
         print("@@@@@@ status=", d['status'])
 
@@ -275,3 +285,9 @@ def upload_file():
         d['status'] = 0
 
     return jsonify(d)
+
+
+# @app.route("/upload", methods=["POST"])
+# def upload_photo():
+#     """Test s3 bucket"""
+#     s3.upload_file("./testphoto.jpg", "friender-rithm-terrysli", "test.photos")

@@ -159,10 +159,15 @@ def delete_user(username):
 
     return jsonify({"Error": "Unauthorized"}), 401
 
-# @app.route("/upload", methods=["POST"])
-# def upload_photo():
-#     """Test s3 bucket"""
-#     s3.upload_file("./testphoto.jpg", "friender-rithm-terrysli", "test.photos")
+# GET friends of user TODO: Add middleware for same user/admin/loggedin
+@app.route("/users/<username>/friends", methods=["GET"])
+def get_friends_for_user(username):
+    """Returns array of friends for user"""
+
+    friends = User.friends(username)
+    serialized = [f.serialize() for f in friends]
+
+    return jsonify(friends=serialized)
 
 
 ########## /messages routes

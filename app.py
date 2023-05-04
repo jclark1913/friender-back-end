@@ -261,11 +261,12 @@ def update_friend_request(friendship_id):
 def upload_file():
     """Handles the upload of a file."""
     d = {}
-    try:
-        file = request.files['file_from_react']
-        filename = file.filename
-        with open(filename, "rb") as f:
-            s3.upload_file(f, "friender-may-2023", filename)
+    # try:
+    file = request.files['file_from_react']
+    #breakpoint()
+    filename = file.filename
+    # with open(filename, "rb") as f:
+    s3.upload_fileobj(file, "friender-rithm-terrysli", filename)
 
 
         # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) NOTE: SAVES TO DIRECTORY
@@ -277,12 +278,12 @@ def upload_file():
         # file_bytes = file.read()
         # file_content = BytesIO(file_bytes).readlines()
         # print(file_content)
-        d['status'] = 1
-        print("@@@@@@ status=", d['status'])
+    d['status'] = 1
+    print("@@@@@@ status=", d['status'])
 
-    except Exception as e:
-        print(f"Couldn't upload file {e}")
-        d['status'] = 0
+    # except Exception as e:
+        # print(f"Couldn't upload file {e}")
+        # d['status'] = 0
 
     return jsonify(d)
 

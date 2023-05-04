@@ -27,6 +27,9 @@ app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['UPLOAD_FOLDER'] = "./temp"
 app.config["JWT_SECRET_KEY"] = "super-secret" # TODO: Update .env
 
+BUCKET_NAME = "friender-rithm-terrysli"
+BUCKET_PUBLIC_PATH = "profile_photos"
+
 connect_db(app)
 
 
@@ -261,29 +264,24 @@ def update_friend_request(friendship_id):
 def upload_file():
     """Handles the upload of a file."""
     d = {}
-    # try:
-    file = request.files['file_from_react']
-    #breakpoint()
-    filename = file.filename
-    # with open(filename, "rb") as f:
-    s3.upload_fileobj(file, "friender-rithm-terrysli", filename)
-
-
-        # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) NOTE: SAVES TO DIRECTORY
-
-
-
+    try:
+        file = request.files['file_from_react']
+        #breakpoint()
+        filename = file.filename
+        # with open(filename, "rb") as f:
+        s3.upload_fileobj(file, BUCKET_NAME, f"{BUCKET_PUBLIC_PATH}/{filename}", ExtraArgs={
+            "ContentType":"image/jpeg"
+        })
 
         # print(f"Uploading file {filename}")
         # file_bytes = file.read()
         # file_content = BytesIO(file_bytes).readlines()
         # print(file_content)
-    d['status'] = 1
-    print("@@@@@@ status=", d['status'])
+        d['status'] = 1
 
-    # except Exception as e:
-        # print(f"Couldn't upload file {e}")
-        # d['status'] = 0
+    except Exception as e:
+        print(f"Couldn't upload file {e}")
+        d['status'] = 0
 
     return jsonify(d)
 

@@ -10,6 +10,8 @@ from flask_jwt_extended import get_jwt
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 import boto3
+from io import BytesIO
+
 s3 = boto3.client('s3')
 
 load_dotenv()
@@ -252,3 +254,24 @@ def update_friend_request(friendship_id):
     db.session.commit()
 
     return jsonify(friendship=serialized)
+
+# Route to upload file to S3
+@app.route('/url_route', methods=['POST'])
+def upload_file():
+    """Handles the upload of a file."""
+    d = {}
+    try:
+        file = request.files['file_from_react']
+        filename = file.filename
+        print(f"Uploading file {filename}")
+        file_bytes = file.read()
+        file_content = BytesIO(file_bytes).readlines()
+        print(file_content)
+        d['status'] = 1
+        print("@@@@@@ status=", d['status'])
+
+    except Exception as e:
+        print(f"Couldn't upload file {e}")
+        d['status'] = 0
+
+    return jsonify(d)

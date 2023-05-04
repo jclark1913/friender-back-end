@@ -3,6 +3,7 @@
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_, join
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -184,17 +185,18 @@ class User(db.Model):
     def friends(self):
         """Return array of all accepted friends"""
 
+
         sender_friends = db.session.query(User)\
-            .join("Friendship, User.username == Friendship.sender")\
-            .filter("or_(Friendship.sender == self.username, Friendship.recipient == self.username)",\
-                "Friendship.status == 'accepted'",\
-                "Friendship.sender != self.username")\
+            .join(Friendship, User.username == Friendship.sender)\
+            .filter(or_(Friendship.sender == self.username, Friendship.recipient == self.username),\
+                Friendship.status == 'accepted',\
+                Friendship.recipient == self.username)\
             .all()
         recipient_friends = db.session.query(User)\
-            .join("Friendship, User.username == Friendship.recipient")\
-            .filter("or_(Friendship.sender == self.username, Friendship.recipient == self.username)",\
-                    "Friendship.status == 'accepted'",\
-                    "Friendship.sender != self.username")\
+            .join(Friendship, User.username == Friendship.recipient)\
+            .filter(or_(Friendship.sender == self.username, Friendship.recipient == self.username),\
+                Friendship.status == 'accepted',\
+                Friendship.sender == self.username)\
             .all()
         return sender_friends + recipient_friends
 

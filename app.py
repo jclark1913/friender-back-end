@@ -30,8 +30,8 @@ app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['UPLOAD_FOLDER'] = "./temp"
 app.config["JWT_SECRET_KEY"] = "super-secret" # TODO: Update .env
 
-# BUCKET_NAME = "friender-rithm-terrysli"
-BUCKET_NAME = "friender-may-2023"
+BUCKET_NAME = "friender-rithm-terrysli"
+#BUCKET_NAME = "friender-may-2023"
 BUCKET_PUBLIC_PATH = "profile_photos"
 
 connect_db(app)

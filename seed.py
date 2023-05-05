@@ -34,8 +34,8 @@ user1 = User(
 )
 
 user2 = User(
-    username = "Terrehh",
-    email = "T@T.com",
+    username = "terrehh",
+    email = "terry@mail.com",
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=48197,
     bio=fake.sentence(),
@@ -44,7 +44,7 @@ user2 = User(
 )
 
 user3 = User(
-    username = fake.ssn(),
+    username = 'johndoe',
     email = fake.email(),
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=fake.postcode(),
@@ -53,7 +53,7 @@ user3 = User(
     is_admin=False
 )
 user4 = User(
-    username = fake.ssn(),
+    username = 'janesmith',
     email = fake.email(),
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=fake.postcode(),
@@ -62,7 +62,7 @@ user4 = User(
     is_admin=False
 )
 user5 = User(
-    username = fake.ssn(),
+    username = 'lolabunny',
     email = fake.email(),
     hashed_password = '$2b$12$9ZmCxLgbag8Beioi4FTsXeg89aFBqyWKyvoeqWYRe9LztTsZs/n2u',
     location=fake.postcode(),
@@ -79,14 +79,14 @@ message1 = Message(
     text = fake.sentence(),
     timestamp=random.choice(RANDOM_TIMESTAMPS),
     from_user = "jdawg",
-    to_user = "Terrehh"
+    to_user = "terrehh"
 )
 
 message2 = Message(
     id = 2,
     text = fake.sentence(),
     timestamp=random.choice(RANDOM_TIMESTAMPS),
-    from_user = "Terrehh",
+    from_user = "terrehh",
     to_user = "jdawg"
 )
 
@@ -106,7 +106,7 @@ db.session.commit()
 friendship1 = Friendship(
     id = 1,
     sender = "jdawg",
-    recipient = "Terrehh",
+    recipient = "terrehh",
     status = "accepted"
 )
 
@@ -138,5 +138,35 @@ friendship5 = Friendship(
     status = "accepted"
 )
 
-db.session.add_all([friendship1, friendship2, friendship3, friendship4, friendship5])
+friendship6 = Friendship(
+    id = 6,
+    sender = user3.username,
+    recipient = "jdawg",
+    status = "accepted"
+)
+
+friendship7 = Friendship(
+    id = 7,
+    sender = user4.username,
+    recipient = "jdawg",
+    status = "accepted"
+)
+
+friendship8 = Friendship(
+    id = 8,
+    sender = user5.username,
+    recipient = "jdawg",
+    status = "accepted"
+)
+
+db.session.add_all([
+    friendship1,
+    friendship2,
+    friendship3,
+    friendship4,
+    friendship5,
+    friendship6,
+    friendship7,
+    friendship8])
+
 db.session.commit()

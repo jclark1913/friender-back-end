@@ -176,15 +176,23 @@ class User(db.Model):
 
 
     @classmethod
-    def messages_from(cls, username):
+    def messages(cls, username):
         """Get all messages from a user"""
 
-        user = User.query.get_or_404(username)
+        sent_messages = db.session.query(Message)\
+            .join(User, User.username == Message.from_user)\
+            .filter(or_(Message.from_user == username, Message.to_user == username))\
+            .all()
+        received_messages = db.session.query(Message)\
+            .join(User, User.username == Message.to_user)\
+            .filter(or_(Message.from_user == username, Message.to_user == username))\
+            .all()
+        return sent_messages + received_messages
+
 
     @classmethod
     def friends(cls, username):
         """Return array of all accepted friends"""
-
 
         sender_friends = db.session.query(User)\
             .join(Friendship, User.username == Friendship.sender)\
@@ -199,6 +207,7 @@ class User(db.Model):
                 Friendship.sender == username)\
             .all()
         return sender_friends + recipient_friends
+
 
 #########  Message Class  ##########
 

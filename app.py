@@ -44,7 +44,7 @@ def get_token(user):
     return jsonify(token)
 
 
-########## auth routes
+########## /auth routes
 
 @app.route("/auth/login", methods=["POST"])
 def login():
@@ -62,9 +62,7 @@ def login():
         return jsonify({"Error": "Invalid username/password"}), 401
 
 
-########################
-
-# /users routes
+########## /users routes
 
 # GET all users (ADMIN ONLY)
 @app.route("/users", methods=["GET"])
@@ -172,20 +170,31 @@ def get_friends_for_user(username):
     return jsonify(friends=serialized)
 
 
+# GET messages either sent or received by user
+@app.route("/users/<username>/messages", methods=["GET"])
+def get_user_messages(username):
+    """Return array of messages involving user"""
+
+    messages = User.messages(username)
+    serialized = [m.serialize() for m in messages]
+
+    return jsonify(messages=serialized)
+
+
 ########## /messages routes
 
 @app.route("/messages", methods=["GET"])
-@jwt_required()
+#@jwt_required()
 def get_all_messages():
     """Return data on all messages"""
 
-    claims = get_jwt()
+    # claims = get_jwt()
 
-    if claims["is_admin"] == True:
-        messages = Message.all()
-        serialized = [m.serialize() for m in messages]
+    # if claims["is_admin"] == True:
+    messages = Message.all()
+    serialized = [m.serialize() for m in messages]
 
-        return jsonify(messages=serialized)
+    return jsonify(messages=serialized)
 
     return jsonify({"Error": "Unauthorized"}), 401
 
@@ -219,7 +228,6 @@ def create_new_message():
 ####### /friendships
 
 @app.route("/friendships", methods=["GET"])
-
 def get_all_friendships():
     """Get all friendship data"""
 

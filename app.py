@@ -276,8 +276,8 @@ def update_friend_request(friendship_id):
     return jsonify(friendship=serialized)
 
 # Route to upload file to S3
-@app.route('/url_route', methods=['POST'])
-def upload_file():
+@app.route('/url_route/<username>', methods=['POST'])
+def upload_file(username):
     """Handles the upload of a file."""
     d = {}
     try:
@@ -285,7 +285,7 @@ def upload_file():
         #breakpoint()
         filename = file.filename
         # with open(filename, "rb") as f:
-        s3.upload_fileobj(file, BUCKET_NAME, f"{BUCKET_PUBLIC_PATH}/jdawg_photo.jpeg", ExtraArgs={
+        s3.upload_fileobj(file, BUCKET_NAME, f"{BUCKET_PUBLIC_PATH}/{username}_photo.jpeg", ExtraArgs={
             "ContentType":"image/jpeg"
         })
 

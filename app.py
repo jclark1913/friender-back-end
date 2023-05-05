@@ -21,6 +21,7 @@ app = Flask(__name__)
 CORS(app)
 jwt = JWTManager(app)
 
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_ECHO'] = False
 #app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
@@ -41,7 +42,7 @@ def get_token(user):
     token = create_access_token(
         identity=user.username,
         additional_claims={"is_admin": user.is_admin})
-    return jsonify(token)
+    return token
 
 
 ########## /auth routes
@@ -57,7 +58,7 @@ def login():
     user = User.authenticate(username, password)
     if user:
         token = get_token(user)
-        return token
+        return jsonify(token=token)
     else:
         return jsonify({"Error": "Invalid username/password"}), 401
 

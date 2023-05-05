@@ -285,7 +285,7 @@ def upload_file():
         #breakpoint()
         filename = file.filename
         # with open(filename, "rb") as f:
-        s3.upload_fileobj(file, BUCKET_NAME, f"{BUCKET_PUBLIC_PATH}/{filename}", ExtraArgs={
+        s3.upload_fileobj(file, BUCKET_NAME, f"{BUCKET_PUBLIC_PATH}/jdawg_photo.jpeg", ExtraArgs={
             "ContentType":"image/jpeg"
         })
 

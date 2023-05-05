@@ -179,15 +179,10 @@ class User(db.Model):
     def messages(cls, username):
         """Get all messages from a user"""
 
-        sent_messages = db.session.query(Message)\
+        return db.session.query(Message)\
             .join(User, User.username == Message.from_user)\
             .filter(or_(Message.from_user == username, Message.to_user == username))\
             .all()
-        received_messages = db.session.query(Message)\
-            .join(User, User.username == Message.to_user)\
-            .filter(or_(Message.from_user == username, Message.to_user == username))\
-            .all()
-        return sent_messages + received_messages
 
 
     @classmethod

@@ -9,6 +9,7 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import get_jwt
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 import boto3
 from io import BytesIO
 
@@ -17,6 +18,7 @@ s3 = boto3.client('s3')
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 jwt = JWTManager(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
@@ -217,6 +219,7 @@ def create_new_message():
 ####### /friendships
 
 @app.route("/friendships", methods=["GET"])
+
 def get_all_friendships():
     """Get all friendship data"""
 

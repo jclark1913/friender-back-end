@@ -281,27 +281,27 @@ def update_friend_request(friendship_id):
 @app.route('/url_route/<username>', methods=['POST'])
 def upload_file(username):
     """Handles the upload of a file."""
-    d = {}
+    # breakpoint()
+    res = { 'body': "returned file"}
     try:
         file = request.files['file_from_react']
-        #breakpoint()
         filename = file.filename
         # with open(filename, "rb") as f:
         s3.upload_fileobj(file, BUCKET_NAME, f"{BUCKET_PUBLIC_PATH}/{username}_photo.jpeg", ExtraArgs={
             "ContentType":"image/jpeg"
         })
-
         # print(f"Uploading file {filename}")
         # file_bytes = file.read()
         # file_content = BytesIO(file_bytes).readlines()
         # print(file_content)
-        d['status'] = 1
+        res['status'] = 1
+        return jsonify(res=res)
 
     except Exception as e:
         print(f"Couldn't upload file {e}")
-        d['status'] = 0
+        res['body'] = "Error"
 
-    return jsonify(d)
+
 
 
 # @app.route("/upload", methods=["POST"])
